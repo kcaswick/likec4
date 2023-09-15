@@ -4,9 +4,9 @@ exports[`generate mermaid - fakeComputedView 3 Levels 1`] = `
 "graph 
 
 Amazon[amazon]
-subgraph Cloud["cloud"]
+subgraph Cloud[cloud]
 
-  subgraph Cloud.Backend["backend"]
+  subgraph Cloud.Backend[backend]
 
     Cloud.Backend.Graphql[graphql]
     Cloud.Backend.Storage[storage]
@@ -30,7 +30,7 @@ exports[`generate mermaid - fakeDiagram 1`] = `
 "graph 
 
 Amazon[amazon]
-subgraph Cloud["cloud"]
+subgraph Cloud[cloud]
 
   Cloud.Backend[backend]
   Cloud.Frontend[frontend]
@@ -69,16 +69,27 @@ graph TB
 System[system]
 Spa[SPA]
 Customer[fa:fa-user Customer]
+style Customer fill:#6366f1,stroke:#4f46e5,color:#eef2ff
 Mobile[Mobile]
-subgraph Lambdas["Lambdas"]
+style Mobile fill:#16a34a,stroke:#15803d,color:#111827
+subgraph Lambdas["Lambdas
+  <span style='font-size:0.7em'>Serverless compute</span>"]
 
-  Lambdas.Fn_enrich[Enrichment]
+  Lambdas.Fn_enrich["Enrichment
+    <span style='font-size:0.7em'>Enriches raw data
+by adding additional information</span>"]
 end
 Pg([PostgreSQL])
-subgraph Sqs["SQS"]
+subgraph Sqs["SQS
+  <span style='font-size:0.7em'>Simple Queue Service</span>"]
 
-  Sqs.Queue1[(Raw Data)]
-  Sqs.Queue2[(Enriched Data)]
+  Sqs.Queue1[("Raw Data
+    <span style='font-size:0.7em'>Queue with raw data</span>")]
+  Sqs.Queue2[("<span style='color: #eef2ff'>Enriched Data
+    </span>
+    <span style='font-size:0.7em; color: #c7d2fe'>Filtered and preprocessed data
+Ready for further processing</span>")]
+  style Sqs.Queue2 fill:#6366f1,stroke:#4f46e5,color:#eef2ff
 end
 
 Lambdas.Fn_enrich --"writes enriched data"--> Sqs.Queue2
