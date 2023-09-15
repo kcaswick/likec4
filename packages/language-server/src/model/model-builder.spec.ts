@@ -11,9 +11,22 @@ describe('LikeC4ModelBuilder', () => {
     const { diagnostics } = await validate(`
     specification {
       element component
+      element container
+      element lambda
       element user {
         style {
           shape person
+        }
+      }
+      element queue {
+        style {
+          shape queue
+        }
+      }
+
+      element database {
+        style {
+          shape storage
         }
       }
     }
@@ -29,6 +42,49 @@ describe('LikeC4ModelBuilder', () => {
         style {
           color green
           shape mobile
+        }
+      }
+      pg = database 'PostgreSQL'
+      sqs = container {
+        title: 'SQS'
+        description: 'Simple Queue Service'
+
+        queue queue1 'Raw Data' {
+          description: 'Queue with raw data'
+        }
+
+        queue queue2 'Enriched Data' {
+          description: '
+            Filtered and preprocessed data
+            Ready for further processing
+          '
+        }
+      }
+
+      lambdas = container {
+        title: 'Lambdas'
+        description: 'Serverless compute'
+
+        fn_enrich = lambda 'Enrichment' {
+          description: '
+            Enriches raw data
+            by adding additional information
+          '
+        }
+
+        fn_enrich -> queue1 "reads raw data"
+        fn_enrich -> pg "reads additional information"
+        fn_enrich -> queue2 "writes enriched data"
+      }
+
+      customer -> mobile
+    }
+    views {
+      view index {
+        include *
+        include lambdas.*, sqs.*
+        style customer {
+          color indigo
         }
       }
     }
@@ -64,6 +120,8 @@ describe('LikeC4ModelBuilder', () => {
     expect(elements['customer']).not.toHaveProperty('color')
     expect(elements['system']).not.toHaveProperty('shape')
     expect(elements['system']).not.toHaveProperty('color')
+
+    expect(model).toMatchFileSnapshot('model-builder-colors-shapes.json')
   })
 
   it('builds model with description and technology', async ({ expect }) => {
