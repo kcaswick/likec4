@@ -149,7 +149,7 @@ function nodeLabel(node: ComputedNode) {
     .indent({
       indentedChildren: indent =>
         indent
-          .append(joinToNode(node.title.replace(`"`, `&quot;`).split('\n'), i => i, { separator: NL }))
+          .append(joinToNode(node.title.replaceAll(`"`, `&quot;`).split('\n'), i => i, { separator: NL }))
           .appendIf(useColor, '</span>')
           .appendIf(
             Boolean(node.technology),
@@ -158,7 +158,7 @@ function nodeLabel(node: ComputedNode) {
                 .appendNewLineIfNotEmpty()
                 .append(`<span style='font-size:0.6em`)
                 .appendIf(useColor, `; color: ${Colors[node.color].loContrast}`).appendTemplate`'>${joinToNode(
-                node.technology?.replace(`"`, `&quot;`)?.split('\n') ?? [],
+                node.technology?.replaceAll(`"`, `&quot;`)?.split('\n') ?? [],
                 i => i,
                 { separator: NL }
               )}</span>`
@@ -170,7 +170,7 @@ function nodeLabel(node: ComputedNode) {
                 .appendNewLineIfNotEmpty()
                 .append(`<span style='font-size:0.7em`)
                 .appendIf(useColor, `; color: ${Colors[node.color].loContrast}`).appendTemplate`'>${joinToNode(
-                node.description?.replace(`"`, `&quot;`)?.split('\n') ?? [],
+                node.description?.replaceAll(`"`, `&quot;`)?.split('\n') ?? [],
                 i => i,
                 { separator: NL }
               )}</span>`
