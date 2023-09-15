@@ -1,3 +1,4 @@
+import { Colors, DefaultThemeColor } from '@likec4/core'
 import type { ComputedEdge, ComputedNode, ComputedView, NodeId } from '@likec4/core/types'
 import { CompositeGeneratorNode, NL, joinToNode, toString } from 'langium'
 import { isNil } from 'rambdax'
@@ -37,13 +38,14 @@ export function generateMermaid<V extends ComputedView>(view: V) {
     const fqnName = (parentName ? parentName + '.' : '') + name
     names.set(node.id, fqnName)
 
-    const label = node.title.replaceAll('\n', '\\n')
+    const label = nodeLabel(node)
     const shape = mmdshape(node)
 
     const baseNode = new CompositeGeneratorNode()
+
     if (node.children.length > 0) {
       baseNode
-        .append('subgraph ', fqnName, '["', label, '"]', NL)
+        .append('subgraph ', fqnName, '[', label, ']', NL)
         .indent({
           indentedChildren: indent =>
             indent.appendIf(
@@ -60,6 +62,19 @@ export function generateMermaid<V extends ComputedView>(view: V) {
     } else {
       baseNode.append(fqnName, shape[0], label, shape[1], NL)
     }
+
+    baseNode.appendIf(
+      node.color !== DefaultThemeColor,
+      'style ',
+      fqnName,
+      ' fill:',
+      Colors[node.color].fill,
+      ',stroke:',
+      Colors[node.color].stroke,
+      ',color:',
+      Colors[node.color].hiContrast,
+      NL
+    )
     return baseNode
   }
   //     return `${names.get(edge.source)} -> ${names.get(edge.target)}${edge.label ? ': ' + edge.label : ''}`
@@ -94,4 +109,54 @@ export function generateMermaid<V extends ComputedView>(view: V) {
         })
       )
   )
+}
+
+function nodeLabel(node: ComputedNode) {
+  // The following regexs are based on the Mermaid parser at https://github.com/mermaid-js/mermaid/blob/develop/packages/mermaid/src/diagrams/flowchart/parser/flow.jison
+  const RE_UNICODE_TEXT = /[\u0100-\uFFFF]/u;// /[\p{L}--[\u0000-\u00A9]]/v;
+  const RE_START_TEXT = /(?<=\(\[|\[\[|[^\-]>|\[\)|\(\(\(|\||\(|\[|\{)/u; // Note that most mmdshapes are here, except ellipse and trapezoid which forbid more punctuation than the others
+  const RE_CONTINUE_TEXT = /[^\[\]\(\)\{\}\|\"]+/; // This can only be used to continue text once started
+  // Note: double quote was removed from the character class below from NODE_STRING - in the jison file other rules usually prevent it from matching
+  // const RE_NODE_STRING = /(?:[A-Za-z0-9!\#$%&'*+\.`?\\_\/]|-(?=[^\>\-\.])|=(?!=))+/v;
+  // const RE_textNoTags = new RegExp(
+  //   `^(?:${RE_NODE_STRING.source}|${/* RE_UNICODE_TEXT.source */""}|${(/[\d]+|[\s&:*#]|\^|[xo<]?(?:--|==|-\.)/u).source})+$`,
+  //   'u'
+  // )
+  const RE_textNoTags = /^(?:(?:[A-Za-z0-9!#$%&'*+\.`?\\_\/]|-(?=[^>\-\.])|=(?!=))+|[\d]+|[\s&:*#]|\^|[xo<]?(?:--|==|-\.))+$/u;
+  const RE_STR = /^"[^"]+"$/u;
+  const RE_MD_STR = /^\"\`[^`"]+\`\"$/;
+
+  const isMultiline = Boolean(node.technology || node.description)
+  const isPlainText = RE_textNoTags.test(node.title)
+  const hasUnicodeText = RE_UNICODE_TEXT.test(node.title)
+
+  if (!isMultiline) {
+    if (isPlainText && !hasUnicodeText) {
+      return node.title.replaceAll('\n', '\\n')
+    }
+    if (RE_STR.test(`"${node.title}"`)) {
+      return `"${node.title}"`
+    }
+  }
+
+  const useColor = node.color !== DefaultThemeColor;
+
+  let value = `"${useColor ? `<span style='color: ${Colors[node.color].hiContrast}'>` : ''}`
+  value += node.title.replace(`"`, `&quot;`)
+  if (useColor) {
+    value += `</span>`
+  }
+
+  if (Boolean(node.technology) && node.technology !== null) {
+    value += `\n<span style='font-size:0.6em${
+      useColor ? `; color: ${Colors[node.color].loContrast}` : ''
+    }'>${node.technology.replace(`"`, `&quot;`)}</span>`
+  }
+  if (Boolean(node.description) && node.description !== null) {
+    value += `\n<span style='font-size:0.7em${
+      useColor ? `; color: ${Colors[node.color].loContrast}` : ''
+    }'>${node.description.replace(`"`, `&quot;`)}</span>`
+  }
+  value += `"`
+  return value
 }

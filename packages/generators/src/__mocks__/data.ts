@@ -633,7 +633,7 @@ export const fakeWithColorsAndShapes = {
     },
     {
       children: [],
-      color: 'primary',
+      color: 'indigo',
       description: 'Filtered and preprocessed data\nReady for further processing',
       id: 'sqs.queue2',
       inEdges: ['lambdas.fn_enrich:sqs.queue2'],
