@@ -45,10 +45,10 @@ export function generateMermaid<V extends ComputedView>(view: V) {
 
     if (node.children.length > 0) {
       baseNode
-        .append('subgraph ', fqnName, '[', label, ']', NL)
+        .append('subgraph ', fqnName, '[')
         .indent({
           indentedChildren: indent =>
-            indent.appendIf(
+            indent.append(label, ']', NL).appendIf(
               node.children.length > 0,
               NL,
               joinToNode(
@@ -56,6 +56,7 @@ export function generateMermaid<V extends ComputedView>(view: V) {
                 n => printNode(n, fqnName)
               )
             ),
+          indentImmediately: false,
           indentation: 2
         })
         .append('end', NL)
@@ -148,25 +149,31 @@ function nodeLabel(node: ComputedNode) {
     .indent({
       indentedChildren: indent =>
         indent
-          .append(
-            joinToNode(node.title.replace(`"`, `&quot;`).split('\n'), i => i, {
-              appendNewLineIfNotEmpty: true
-            })
-          )
+          .append(joinToNode(node.title.replace(`"`, `&quot;`).split('\n'), i => i, { separator: NL }))
           .appendIf(useColor, '</span>')
-          .appendIf(Boolean(node.technology), n =>
-            n
-              .appendNewLineIfNotEmpty()
-              .append(`<span style='font-size:0.6em`)
-              .appendIf(useColor, `; color: ${Colors[node.color].loContrast}`)
-              .append(`'>${node.technology?.replace(`"`, `&quot;`)}</span>`)
+          .appendIf(
+            Boolean(node.technology),
+            n =>
+              n
+                .appendNewLineIfNotEmpty()
+                .append(`<span style='font-size:0.6em`)
+                .appendIf(useColor, `; color: ${Colors[node.color].loContrast}`).appendTemplate`'>${joinToNode(
+                node.technology?.replace(`"`, `&quot;`)?.split('\n') ?? [],
+                i => i,
+                { separator: NL }
+              )}</span>`
           )
-          .appendIf(Boolean(node.description), n =>
-            n
-              .appendNewLineIfNotEmpty()
-              .append(`<span style='font-size:0.7em`)
-              .appendIf(useColor, `; color: ${Colors[node.color].loContrast}`)
-              .append(`'>${node.description?.replace(`"`, `&quot;`)}</span>`)
+          .appendIf(
+            Boolean(node.description),
+            n =>
+              n
+                .appendNewLineIfNotEmpty()
+                .append(`<span style='font-size:0.7em`)
+                .appendIf(useColor, `; color: ${Colors[node.color].loContrast}`).appendTemplate`'>${joinToNode(
+                node.description?.replace(`"`, `&quot;`)?.split('\n') ?? [],
+                i => i,
+                { separator: NL }
+              )}</span>`
           )
           .append(`"`),
       indentImmediately: false,

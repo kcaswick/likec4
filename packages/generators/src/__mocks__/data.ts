@@ -629,7 +629,7 @@ export const fakeWithColorsAndShapes = {
       shape: 'queue',
       tags: null,
       technology: null,
-      title: 'Raw Data'
+      title: 'Raw\nData'
     },
     {
       children: [],
