@@ -22,10 +22,7 @@ export const fakeDiagram: DiagramView = {
         [291, 461],
         [291, 487]
       ],
-      relations: [
-        'cloud.frontend.dashboard:cloud.backend.graphql',
-        'cloud.frontend.adminPanel:cloud.backend.graphql'
-      ],
+      relations: ['cloud.frontend.dashboard:cloud.backend.graphql', 'cloud.frontend.adminPanel:cloud.backend.graphql'],
       source: 'cloud.frontend',
       target: 'cloud.backend'
     },
@@ -458,3 +455,232 @@ export const fakeComputedView3Levels: ComputedView = {
   title: '',
   viewOf: 'cloud'
 } as any
+
+export const fakeWithColorsAndShapes = {
+  autoLayout: 'TB',
+  description: null,
+  edges: [
+    {
+      id: 'lambdas.fn_enrich:sqs.queue2',
+      label: 'writes enriched data',
+      parent: null,
+      relations: ['8dc31cd4c2935bae340e0f0417d0abd243e33931'],
+      source: 'lambdas.fn_enrich',
+      target: 'sqs.queue2'
+    },
+    {
+      id: 'lambdas.fn_enrich:sqs.queue1',
+      label: 'reads raw data',
+      parent: null,
+      relations: ['6c081d46a909612abf5140d018df2dc72794a304'],
+      source: 'lambdas.fn_enrich',
+      target: 'sqs.queue1'
+    },
+    {
+      id: 'lambdas.fn_enrich:pg',
+      label: 'reads additional information',
+      parent: null,
+      relations: ['4cb1040e50fc60ccc3626bf27bb52c1160f1b618'],
+      source: 'lambdas.fn_enrich',
+      target: 'pg'
+    },
+    {
+      id: 'customer:mobile',
+      label: null,
+      parent: null,
+      relations: ['7446a8f98049c08e2387d30083f141bbbf4de909'],
+      source: 'customer',
+      target: 'mobile'
+    }
+  ],
+  id: 'index',
+  links: null,
+  nodes: [
+    {
+      children: [],
+      color: 'primary',
+      description: null,
+      id: 'system',
+      inEdges: [],
+      kind: 'component',
+      links: null,
+      outEdges: [],
+      parent: null,
+      shape: 'rectangle',
+      tags: null,
+      technology: null,
+      title: 'system'
+    },
+    {
+      children: [],
+      color: 'primary',
+      description: null,
+      id: 'spa',
+      inEdges: [],
+      kind: 'component',
+      links: null,
+      outEdges: [],
+      parent: null,
+      shape: 'browser',
+      tags: null,
+      technology: null,
+      title: 'SPA'
+    },
+    {
+      children: [],
+      color: 'indigo',
+      description: null,
+      id: 'customer',
+      inEdges: [],
+      kind: 'user',
+      links: null,
+      outEdges: ['customer:mobile'],
+      parent: null,
+      shape: 'person',
+      tags: null,
+      technology: null,
+      title: 'Customer'
+    },
+    {
+      children: [],
+      color: 'green',
+      description: null,
+      id: 'mobile',
+      inEdges: ['customer:mobile'],
+      kind: 'component',
+      links: null,
+      outEdges: [],
+      parent: null,
+      shape: 'mobile',
+      tags: null,
+      technology: null,
+      title: 'Mobile'
+    },
+    {
+      children: ['lambdas.fn_enrich'],
+      color: 'primary',
+      description: 'Serverless compute',
+      id: 'lambdas',
+      inEdges: [],
+      kind: 'container',
+      links: null,
+      outEdges: [],
+      parent: null,
+      shape: 'rectangle',
+      tags: null,
+      technology: null,
+      title: 'Lambdas'
+    },
+    {
+      children: [],
+      color: 'primary',
+      description: 'Enriches raw data\nby adding additional information',
+      id: 'lambdas.fn_enrich',
+      inEdges: [],
+      kind: 'lambda',
+      links: null,
+      outEdges: ['lambdas.fn_enrich:sqs.queue2', 'lambdas.fn_enrich:sqs.queue1', 'lambdas.fn_enrich:pg'],
+      parent: 'lambdas',
+      shape: 'rectangle',
+      tags: null,
+      technology: null,
+      title: 'Enrichment'
+    },
+    {
+      children: [],
+      color: 'primary',
+      description: null,
+      id: 'pg',
+      inEdges: ['lambdas.fn_enrich:pg'],
+      kind: 'database',
+      links: null,
+      outEdges: [],
+      parent: null,
+      shape: 'storage',
+      tags: null,
+      technology: null,
+      title: 'PostgreSQL'
+    },
+    {
+      children: ['sqs.queue1', 'sqs.queue2'],
+      color: 'primary',
+      description: 'Simple Queue Service',
+      id: 'sqs',
+      inEdges: [],
+      kind: 'container',
+      links: null,
+      outEdges: [],
+      parent: null,
+      shape: 'rectangle',
+      tags: null,
+      technology: null,
+      title: 'SQS'
+    },
+    {
+      children: [],
+      color: 'primary',
+      description: 'Queue with raw data',
+      id: 'sqs.queue1',
+      inEdges: ['lambdas.fn_enrich:sqs.queue1'],
+      kind: 'queue',
+      links: null,
+      outEdges: [],
+      parent: 'sqs',
+      shape: 'queue',
+      tags: null,
+      technology: null,
+      title: 'Raw Data'
+    },
+    {
+      children: [],
+      color: 'primary',
+      description: 'Filtered and preprocessed data\nReady for further processing',
+      id: 'sqs.queue2',
+      inEdges: ['lambdas.fn_enrich:sqs.queue2'],
+      kind: 'queue',
+      links: null,
+      outEdges: [],
+      parent: 'sqs',
+      shape: 'queue',
+      tags: null,
+      technology: null,
+      title: 'Enriched Data'
+    }
+  ],
+  rules: [
+    {
+      exprs: [
+        {
+          wildcard: true
+        }
+      ],
+      isInclude: true
+    },
+    {
+      exprs: [
+        {
+          element: 'lambdas',
+          isDescedants: true
+        },
+        {
+          element: 'sqs',
+          isDescedants: true
+        }
+      ],
+      isInclude: true
+    },
+    {
+      style: {
+        color: 'indigo'
+      },
+      targets: [
+        {
+          element: 'customer',
+          isDescedants: false
+        }
+      ]
+    }
+  ],
+  tags: null,
+  title: 'Landscape view'
+} as unknown as ComputedView

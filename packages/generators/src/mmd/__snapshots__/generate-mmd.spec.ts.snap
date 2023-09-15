@@ -59,3 +59,31 @@ SystemFrontend --"requests"--> SystemBackend
 Client --"opens"--> SystemFrontend
 "
 `;
+
+exports[`generate mermaid - with colors and shapes 1`] = `
+"---
+title: Landscape view
+---
+graph TB
+
+System[system]
+Spa[SPA]
+Customer[fa:fa-user Customer]
+Mobile[Mobile]
+subgraph Lambdas["Lambdas"]
+
+  Lambdas.Fn_enrich[Enrichment]
+end
+Pg([PostgreSQL])
+subgraph Sqs["SQS"]
+
+  Sqs.Queue1[(Raw Data)]
+  Sqs.Queue2[(Enriched Data)]
+end
+
+Lambdas.Fn_enrich --"writes enriched data"--> Sqs.Queue2
+Lambdas.Fn_enrich --"reads raw data"--> Sqs.Queue1
+Lambdas.Fn_enrich --"reads additional information"--> Pg
+Customer --> Mobile
+"
+`;
